@@ -1,0 +1,12 @@
+---
+title: "README"
+output: html_document
+autor: "Kathryn Sestero"
+date: "`r Sys.Date()`"
+---
+This is a project by Kathryn Sestero analyzing data on various top rated IMDb movies from 1898-2022. It uses a data set from [Kaggle](https://www.kaggle.com/datasets/digvijaysinhgohil/imdb-dataset-toprated-films-18982022).
+
+```{r}
+
+
+```
