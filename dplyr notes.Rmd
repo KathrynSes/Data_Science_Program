@@ -1,0 +1,131 @@
+---
+title: "data_processing_notes"
+output: html_document
+date: '2022-07-13'
+---
+ ## Introduction to dplyr 
+ dplyr is an R pakage in the tidyverse. We can load the package using:
+```{r}
+install.packages("dplyr")
+library(dplyr)
+?dplyr
+library(ggplot2)
+head(starwars)
+```
+### Filtering Data 
+We can filter data using  `filter()` which allows for us to subset based on row value
+Tips:
+
+* Be sure to speell column name right and the valye name if needed. R is case sensitive 
+* Be sure to use `==` when comparing observations. 
+* Use >, <, <=, >= to compare numeric or categorical variables (nominal variables are ranked alphabetically, while ordinal variables have a built-in rank)
+```{r}
+filter(starwars, hair_color == "blond" | hair_color == "blonde")
+filteredData <- filter(starwars, skin_color == "fair", species == "Human", homeworld == "Tatooine")
+places <- c("Tatooine", "Naboo")
+filter(starwars, homeworld %in% places)
+```
+Diamonds 
+```{r}
+head(diamonds) # displays first 6 rows
+class(diamonds$cut) # gives specific type of data 
+summary(diamonds$cut) # count or summary statistic 
+summary(diamonds$carat)
+head(diamonds$cut) # displays first 6 
+
+filter(diamonds, cut > "Good")
+
+#ordering categorical data
+unique(starwars$eye_color)
+factor(starwars, c("red", "orange", "gold", "yellow", "green, yellow", "blue"), ordered = T)
+
+# find all chracters that are shorter than 100 cm 
+head(starwars)
+filter(starwars, height < 100, species != "Droid")
+
+#find all characters who were born between the years 100 and 200 
+filter(starwars, birth_year >= 100 & birth_year <= 200)
+
+# find all character with weight over 100 but are shorter than 185 
+filter(starwars, mass > 100 & height < 185)
+
+#Missing values 
+
+NA > 5 # doesn't know 
+
+# find which characters are missing a hair color 
+filter(starwars, is.na(hair_color))
+```
+
+### Arranging Data 
+`arrange()` reorders rows. It does not remove any rows. NA values are always at the end when you order by a column
+```{r}
+arrange(starwars, desc(birth_year))
+
+arrange(starwars, hair_color, birth_year)
+
+# Star wars tallest and shortest 
+arrange(starwars, desc(height))
+# A-Z by name
+arrange(starwars, name)
+# How to use arrange() to sort all missing values to the start 
+arrange(starwars, desc(is.na(starwars)))
+```
+
+### We can selct certian columns in the dataset 
+`select()` allows us to retain only certain variables (columns).It doesn't change the order but it removes coloumns not named
+```{r}
+select(starwars, name, birth_year)
+select(starwars, contains("_"))
+
+# Practice 1 
+# Select out the homeworld and species for the data set 
+select(starwars, homeworld, species)
+# How to select hair_color, eye_color, skin_color and birth_year
+select(starwars, ends_with("color"), birth_year)
+select(starwars, contains("_"))
+select(starwars, starts_with("h"), starts_with("e"), starts_with("s"), starts_with("b"))
+```
+
+### Adding new columns 
+`mutate()` adds new columns to the end of your dataset
+```{r}
+small <- select(starwars, height, mass, birth_year)
+head(small)
+small <- mutate(small, height_m = height/100)
+mutate(small, bmi = mass/(height_m^2))
+```
+###Piping 
+```{r}
+species_masses <- summarise(group_by(starwars, species),
+mean_mass = mean(mass, na.rm = 1),
+count = nO) # nO returns the number of values in each species
+# the pipe operator %>%
+# function(x, y) is the same as x %>% function(y)
+# When using dplyr functions, generally always start with dataset
+species_masses <- starwars %>% 
+  group_by(species) %>%
+  summarise(mean_mass = mean(mass, na.rm = T), count = nO)
+arrange(species_masses, desc(mean_mass))
+```
+
+### Sampling a designated number of rows
+`sample_n()` allows us to sample a random number of rows from our dataset
+```{r}
+starwars_10rows <- sample_n(starwars,10)
+starwars_10rows
+# 10% of rows
+starwars_10percent <- sample_frac(starwars, 0.1)
+starwars_10percent
+```
+
+## Slicing 
+We can take a "slice" of a dataset using `slice()` and its related set of functions. Retains rows and is not random.
+```{r}
+slice(starwars, 50:50) # slice by index value (row number)
+slice_head(starwars, n = 10) # first 10 rows by index 
+slice_tail(starwars, n = 10) # last 10 rows by  index 
+slice_min(starwars, order_by = height, n = 10) # rows with losed 10 heigths 
+slice_max(starwars, order_by = height, n = 10) # rows with 10 tallest
+
+```
