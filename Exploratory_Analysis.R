@@ -33,3 +33,7 @@ oldness
 
 #Renaming Columns
 rename(movies, IMDb.Rating = newRating)
+
+#t-test 
+rate = filter(movies, IMDb.Rating > 1)
+t.test(Sepal.Length, mu = pop_mean)
